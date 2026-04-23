@@ -278,13 +278,14 @@
         .btn { border-radius: 8px; padding: 11px; font-size: 0.75rem; cursor: pointer; transition: all 0.3s; font-family: 'LXGW WenKai TC', sans-serif; display: flex; align-items: center; justify-content: center; letter-spacing: 0.3em; text-indent: 0.3em; border: 1px solid transparent; /* 預設先給透明邊框 */
     box-sizing: border-box; /* 確保邊框不增加按鈕寬度 */}
         .btn-primary { background: var(--text-main); color: var(--bg-color);border: 0.5px solid transpbarent; /* 預設透明邊框，防止抖動 */
-    color: var(--star-color); transition: all 0.3s ease;
+ ; transition: all 0.3s ease;
     cursor: pointer; }
         .btn-secondary { background: transparent; border: 0.5px solid var(--btn-border); color: var(--text-sub);transition: all 0.3s ease;
     cursor: pointer; }
 	.btn-primary:hover {
-    border-color: var(--star-color);     /* 邊框變藍 */
-    transform: translateY(-2px); /* 輕微上浮感 */
+    	 border-color: var(--star-color);     /* 邊框變藍 */
+       color: var(--star-color);
+	transform: translateY(-2px); /* 輕微上浮感 */
 }
 
 	.btn-secondary:hover {
