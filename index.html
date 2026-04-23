@@ -583,8 +583,10 @@ setTimeout(() => {
         function fadeAudioIn() {
             if (!isPlayerReady || isMuted) return;
             clearInterval(fadeInterval);
-           
-            player.playVideo(); 
+           // 如果點擊星星時沒啟動成功，這裡做二次補償
+            if (!isAlreadyStarted) {
+            player.playVideo();
+	}
             let vol = 0;
             fadeInterval = setInterval(() => {
                 vol += 2; 
@@ -593,7 +595,7 @@ setTimeout(() => {
                     clearInterval(fadeInterval);
                 }
                 player.setVolume(vol);
-            }, 40); 
+            }, 30); 
         }
 
         function fadeAudioOut() {
@@ -649,10 +651,13 @@ setTimeout(() => {
     // 即使現在音量是 0，也要先拿到播放權
     if (isPlayerReady && !isMuted) {
         player.setVolume(0);
+        player.loadVideoById({
+            videoId: current.ytId,
+            startSeconds: current.start || 0,
+            suggestedQuality: 'small'
+        });
         player.playVideo();
-        // 確保從設定的起始點開始
-        player.seekTo(current.start || 0);
-    }
+	}
     
     card.classList.add('revealed');
     
