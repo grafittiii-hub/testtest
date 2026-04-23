@@ -662,6 +662,17 @@
 	tutorialOverlay.addEventListener('click', (e) => {
   	  triggerHaptic();
 
+	// 【手機版解鎖關鍵】：在這裡徹底激活 YouTube Player
+        if (isPlayerReady && player) {
+            player.playVideo(); 
+            // 播放 100ms 後立刻暫停，這在手機上完成了「授權」
+            setTimeout(() => {
+                if (!card.classList.contains('revealed')) {
+                    player.pauseVideo();
+                }
+            }, 100);
+        }
+
     const star = document.getElementById('placeholder');
     const rect = star.getBoundingClientRect();
     // 檢查是否點擊在星星範圍內
@@ -699,25 +710,29 @@
 placeholder.addEventListener('click', (e) => {
     e.stopPropagation();
     if (card.classList.contains('revealed')) return;
+
+// 【手機版核心修復 1】：立即奪取播放權，不要等待任何邏輯
+    if (isPlayerReady && player) {
+        player.playVideo(); // 這裡必須先 call，讓瀏覽器知道用戶點了
+        player.setVolume(0); // 隨即靜音，準備切換歌曲
+    }
+
     triggerHaptic();
     
     if (!current) rollNextLyric();
 
     if (isPlayerReady) {
-        // 不管現在是不是 Muted，都要叫它 Load 影片，否則進度條不會跑
-	player.setVolume(0);
         player.loadVideoById({
             videoId: current.ytId,
-            startSeconds: current.start || 0
+            startSeconds: current.start || 0,
+		suggestedQuality: 'small'
 		
         });
-        player.playVideo();
-        
+               
         // 如果不是靜音，就漸入音量
         if (!isMuted) {
-            setTimeout(() => { fadeAudioIn(); }, 200);
-        } else {
-            player.setVolume(0); // 如果是靜音，確保音量為 0
+            player.setVolume(1); // 先給 1% 音量避免被攔截
+            fadeAudioIn();
         }
     }
     
