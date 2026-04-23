@@ -42,8 +42,7 @@
 }
 
 /* 2. 當 App 準備好時（fonts-ready 標籤出現後）顯示 */
-.fonts-ready .theme-toggle, 
-.fonts-ready .mute-control {
+.fonts-ready .theme-toggle {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -147,17 +146,34 @@
             font-size: 1.1rem;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            display: flex;
+            display: none;
+			opacity: 0;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 100;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             pointer-events: auto;
         }
+/* 當卡片翻開後，顯示並漸入 */
+.card.revealed ~ .mute-control {
+    display: flex; /* 或者是你原本的 display 方式 */
+    opacity: 1;
+}
 
+/* 為了讓用戶知道要點這裡，我們可以加一個微弱的呼吸燈特效 (選配) */
+@keyframes pulse-blue {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(96, 165, 250, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
+}
+
+.card.revealed ~ .mute-control {
+    animation: pulse-blue 2s infinite;
+}
+		
 	.mute-control:hover {
 	    border-color: var(--star-color);     /* 邊框變藍 */
 	}
@@ -645,12 +661,22 @@ setTimeout(() => {
             triggerHaptic();
             
             if (!current) rollNextLyric();
-            card.classList.add('revealed');
-            setTimeout(() => {
-		fadeAudioIn();
-   		 }, 100);
-        });
-
+// 【關鍵修改】在移動端，必須在點擊發生的瞬間「立即」觸發 play
+    // 即使現在音量是 0，也要先拿到播放權
+    if (isPlayerReady && !isMuted) {
+        player.setVolume(0);
+        player.playVideo();
+        // 確保從設定的起始點開始
+        player.seekTo(current.start || 0);
+    }
+    
+    card.classList.add('revealed');
+    
+    // 漸入效果可以留在延遲裡，因為這只是調整音量，不涉及啟動播放
+    setTimeout(() => {
+        fadeAudioIn(true); // 傳入參數代表已經 play 過了
+    }, 100);
+});
         document.getElementById('reset-btn').addEventListener('click', (e) => {
             e.stopPropagation(); 
             card.classList.remove('revealed');
