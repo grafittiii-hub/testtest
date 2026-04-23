@@ -798,7 +798,20 @@ setTimeout(() => {
                 checkOverallReady();
             }
         }, 4500);
-
+// 在你的 backBtn 點擊事件中
+backBtn.addEventListener('click', () => {
+    // 1. 漸出音樂並暫停
+    fadeAudioOut();
+    
+    // 2. UI 回到主頁
+    card.classList.remove('revealed');
+    
+    // 3. 【關鍵】提前抽取下一首歌的數據 (但不播放)
+    // 這樣下次點星星時，current 已經有值了，可以直接 loadVideoById
+    setTimeout(() => {
+        rollNextLyric(); 
+    }, 500); 
+});
     </script>
 </body>
 </html>
