@@ -42,7 +42,8 @@
 }
 
 /* 2. 當 App 準備好時（fonts-ready 標籤出現後）顯示 */
-.fonts-ready .theme-toggle {
+.fonts-ready .theme-toggle,
+.fonts-ready .mute-control {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -146,8 +147,6 @@
             font-size: 1.1rem;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            display: none;
-			opacity: 0;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -157,22 +156,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             pointer-events: auto;
         }
-/* 當卡片翻開後，顯示並漸入 */
-.card.revealed ~ .mute-control {
-    display: flex; /* 或者是你原本的 display 方式 */
-    opacity: 1;
-}
 
-/* 為了讓用戶知道要點這裡，我們可以加一個微弱的呼吸燈特效 (選配) */
-@keyframes pulse-blue {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(96, 165, 250, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
-}
-
-.card.revealed ~ .mute-control {
-    animation: pulse-blue 2s infinite;
-}
 		
 	.mute-control:hover {
 	    border-color: var(--star-color);     /* 邊框變藍 */
