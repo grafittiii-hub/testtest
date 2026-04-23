@@ -415,7 +415,7 @@
             { s: "如何部署一人面對細雨/狂雷/落石/末日/自己/捱一半害怕?", t: "Even if you starting losing your hold<br>Please never never being hopeless", i: "在最絕望的深淵，只要你還在呼吸，就依然有重新站起的理由。", u: "https://youtu.be/EWispEWX3X4", ytId: "EWispEWX3X4", start:128 },
             { s: "Let's Never…", t: "觸不到 終於知道<br>早應說愛不吞吐", i: "遺憾是那句來不及說出口的真心話。有些距離不是因為遠，而是因為我們在該勇敢的時候選擇了沈默。", u: "https://youtu.be/vYL5odhxlVY", ytId: "vYL5odhxlVY", start:34 },
             { s: "Let's Never…", t: "劃破夜空 似對我笑著<br>跨過大海 冷卻了憂傷<br>但也沒可救藥 未減退遐想", i: "思念是無藥可救的頑疾。即便時間冷卻了傷口，那些關於你的遐想依然會隨星光不期而至。", u: "https://youtu.be/vYL5odhxlVY", ytId: "vYL5odhxlVY", start:40 },
-            { s: "Let's Never…", t: "即使折磨拖垮着我<br>不想略過忘記當初", i: "痛苦也是記憶的一部分。與其優雅地忘記，我寧願狼狽地記住，記住我們那時最熾熱的模樣。", u: "https://youtu.be/vYL5odhxlVY", ytId: "vYL5odhxlVY", start:71 },
+            { s: "Let's Never…", t: "即使折磨拖垮着我<br>不想略過忘記當初", i: "痛苦也是記憶的一部分。與其優雅地忘記，我寧願狼狽地記住，記住我們那時最熾熱的模樣。", u: "https://youtu.be/vYL5odhxlVY", ytId: "vYL5odhxlVY", start:72 },
             { s: "永夜漂流", t: "若愛 會永遠不動搖<br>但你 在力證它可笑<br>猶如步過用完的斷橋", i: "承諾就像那座斷橋，走過去了才發現搖搖欲墜，不可維繫。", u: "https://youtu.be/puK8ivwAoog", ytId: "puK8ivwAoog", start:42 },
             { s: "永夜漂流", t: "關起雙眼奢想已久<br>失憶好過身體消瘦<br>欺騙 所有<br>I hope you'll be fine", i: "哪怕是矛盾得自欺欺人，我願意用一切去昧著受傷的真心，為暫時送上放手的祝福。", u: "https://youtu.be/puK8ivwAoog", ytId: "puK8ivwAoog", start:83 },
             { s: "永夜漂流", t: "I hope you'll be fine<br>Good night", i: "最溫柔的殘酷，莫過於在斷聯前那句客氣的祝願。晚安，是在這個黑夜裡我能給你最後的愛。", u: "https://youtu.be/puK8ivwAoog", ytId: "puK8ivwAoog", start:93 },
@@ -490,10 +490,10 @@ function updateProgress(val) {
     }
 }
 
-// 0.5秒後背景粒子漸入
+// 0.1秒後背景粒子漸入
 setTimeout(() => {
     canvas.style.opacity = "1";
-}, 500);
+}, 100);
         
         // 優化：確保此全域函數定義在載入 API 之前
         window.onYouTubeIframeAPIReady = function() {
@@ -508,6 +508,7 @@ setTimeout(() => {
                     'onReady': (event) => { 
                         isPlayerReady = true; 
                         player.setVolume(0);
+		rollNextLyric();
                         let p = 40;
                 const interval = setInterval(() => {
                     p += 20;
@@ -515,10 +516,7 @@ setTimeout(() => {
                     if(p >= 100) clearInterval(interval);
                 }, 800);
                         
-                        if(current && current.ytId) {
-                            player.cueVideoById({videoId: current.ytId, startSeconds: current.start});
-                        }
-                        
+                                                
                         playerReadyStatus = true;
                         updateProgress(90); 
                         checkOverallReady();
@@ -582,10 +580,17 @@ setTimeout(() => {
                     fadeAudioIn();
                 }
 } else if (!isMuted && isPlayerReady) {
-        // 【新增邏輯】如果在首頁點擊「解除靜音」，我們先靜音播放再暫停
-        // 這是為了繞過瀏覽器的限制，讓後續播放順暢
+// 【修改點 2】在首頁點擊解除靜音時，播放目前已經選好的 current 歌曲
+        // 這樣瀏覽器會記錄：使用者已經允許這個播放器發出聲音
         player.playVideo();
-        setTimeout(() => { if(!card.classList.contains('revealed')) player.pauseVideo(); }, 100);
+        // 0.2秒後暫停，這足以完成「授權」
+        setTimeout(() => { 
+            if(!card.classList.contains('revealed')) {
+                player.pauseVideo(); 
+                // 暫停後要把進度拉回開始位置，確保進去歌詞頁時是從頭播放
+                player.seekTo(current.start || 0);
+            }
+        }, 200);
             }
         });
 
@@ -598,7 +603,9 @@ setTimeout(() => {
             
             if (!current) rollNextLyric();
             card.classList.add('revealed');
-            fadeAudioIn();
+            setTimeout(() => {
+		fadeAudioIn();
+   		 }, 100);
         });
 
         document.getElementById('reset-btn').addEventListener('click', (e) => {
